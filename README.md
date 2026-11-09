@@ -48,6 +48,22 @@ scp BBK.bar devuser@169.254.0.1:/accounts/1000/shared/misc/BBK.bar
 ssh devuser@169.254.0.1 'sh /tmp/gdej.sh'   # 设备上的重装脚本
 ```
 
+## 发布新版本
+
+一条命令完成版本号更新、编译打包、提交推送、创建 GitHub Release 并上传 `BBK.bar`：
+
+```powershell
+.\release.ps1 -Version 1.0.1 -Notes "改了什么"
+```
+
+- `-DryRun`：只演练，不动远端
+- `-SkipBuild`：复用现有 `BBK.bar`
+- `-Prerelease`：标记为预发布
+- `-NotesFile notes.md`：从文件读发布说明
+
+依赖 WSL 里的 `bbndk-term50` 容器，以及凭据管理器里可用的 github.com 凭据。
+`build.sh` 是脚本内部使用的编译步骤（同步源码 → 容器内 qmake/make → 打包）。
+
 ## 使用
 
 1. 在电脑上把手机配对（蓝牙设置里会多出一个键盘/鼠标设备）

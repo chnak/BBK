@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    BBK - the BlackBerry Q20 as a Bluetooth keyboard and mouse.
+-->
+<qnx xmlns="http://www.qnx.com/xsd/qnx">
+    <!--  Name of author which is used for signing. Must match the developer name of your development certificate. -->
+    <author>BGmot</author>
+
+    <icon>
+       <image>BBK_icon144x144.png</image>
+    </icon>
+    <asset path="assets/BBK_icon144x144.png">BBK_icon144x144.png</asset>
+    <asset path="assets">assets</asset>
+
+	<initialWindow>
+		<aspectRatio>portrait</aspectRatio>
+		<autoOrients>false</autoOrients>
+		<systemChrome>none</systemChrome>
+		<transparent>false</transparent>
+	</initialWindow>
+
+    <id>com.bgshell.bbk</id>
+    <name>BBK</name>
+    <type>application</type>
+    <versionNumber>1.0.0</versionNumber>
+    <description>Bluetooth keyboard and mouse for the PC</description>
+
+    <!-- The Bluetooth HID device role and the camera-free screen handling. -->
+    <configuration id="com.qnx.qcc.toolChain.585662339" name="Device-Release">
+		<platformArchitecture>armle-v7</platformArchitecture>
+		<asset path="arm/o.le-v7/BBK" entry="true" type="Qnx/Elf">BBK</asset>
+	</configuration>
+	<configuration id="com.qnx.qcc.toolChain.1526872727" name="Simulator-Debug">
+		<platformArchitecture>x86</platformArchitecture>
+		<asset path="x86/o-g/BBK" entry="true" type="Qnx/Elf">BBK</asset>
+	</configuration>
+
+	<!-- Request permission to execute native code.  Required for native applications. -->
+	<permission system="true">run_native</permission>
+    <permission>access_internet</permission>
+    <permission>access_shared</permission>
+    <permission>run_when_backgrounded</permission>
+    <!-- The HID device role needs the bluetooth service. -->
+    <permission>bluetooth</permission>
+	<env var="LD_LIBRARY_PATH" value="app/native/lib:/usr/lib/qt4/lib"/>
+</qnx>

@@ -47,7 +47,6 @@
 #include <bps/event.h>
 
 #include "bbkhid.h"
-#include "bbkhaptic.h"
 
 // How many touch pixels make one mouse pixel.
 static const int kTouchScale = 2;
@@ -63,12 +62,6 @@ static const KeyDef gKeys[] = {
 };
 static const KeyDef *bbkKeys()    { return gKeys; }
 static const int     bbkKeyCount(){ return (int)(sizeof(gKeys) / sizeof(gKeys[0])); }
-
-// The buttons that do something of their own rather than sending a key.
-enum {
-	ActVibe                // haptic feedback on/off
-};
-
 
 // ---------------------------------------------------------------- trackpad
 // The Q20's trackpad does NOT arrive as Qt key events.  It shows up as a BPS
@@ -542,8 +535,6 @@ static const char *kButtonStyle =
     "  border: 1px solid #232d36; border-radius: 9px;"
     "  font-size: 8pt; padding: 0px; }"
     "QToolButton:pressed { background: #0a3d22;"
-    "  border-color: #00d060; color: #ffffff; }"
-    "QToolButton:checked { background: #0a3d22;"
     "  border-color: #00d060; color: #ffffff; }";
 
 // The touchpad.  Reports relative movement, which is what a mouse does.
@@ -893,7 +884,6 @@ public:
 		_keyTaps = new QSignalMapper(this);
 		_rightShift = false;
 		_symDown = false;
-		_haptic = true;
 		setFocusPolicy(Qt::StrongFocus);
 		setAutoFillBackground(true);
 		QPalette pal = palette();
@@ -929,29 +919,6 @@ public:
 		root->addLayout(keys);
 		connect(_keyTaps, SIGNAL(mapped(int)), this, SLOT(onShortcut(int)));
 
-		// A strip for the phone's own feature: the vibration motor as an
-		// on/off switch.
-		QHBoxLayout *acts = new QHBoxLayout;
-		acts->setSpacing(5);
-		const char *actLabels[] = { "振动开" };
-		for (int i = 0; i < 1; ++i) {
-			QToolButton *b = new QToolButton(this);
-			b->setText(QString::fromUtf8(actLabels[i]));
-			b->setMinimumHeight(42);
-			b->setMinimumWidth(56);
-			b->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-			b->setFocusPolicy(Qt::NoFocus);
-			b->setStyleSheet(kButtonStyle);
-			if (i == ActVibe) {
-				b->setCheckable(true);
-				b->setChecked(_haptic);
-			}
-			acts->addWidget(b, 1);
-			QObject::connect(b, SIGNAL(clicked()), this, SLOT(onAction()));
-			b->setProperty("bbkAction", i);
-		}
-		root->addLayout(acts);
-
 		// No address field and no connect button: the address is looked up
 		// from the paired list and the link is kept up automatically.
 		qApp->installEventFilter(this);
@@ -973,11 +940,6 @@ public:
 		connect(_pad, SIGNAL(dragEnded()), this, SLOT(onDragEnded()));
 		connect(&_hid, SIGNAL(peerConnected(QString)), this, SLOT(onPeer(QString)));
 		connect(&_hid, SIGNAL(peerDisconnected()), this, SLOT(onPeerGone()));
-
-		if (BbkHaptic::isSupported())
-			qDebug("BBK: vibration motor available");
-		else
-			qDebug("BBK: no vibration motor");
 
 		QString error;
 		if (!_hid.start(&error)) {
@@ -1124,8 +1086,6 @@ protected:
 					       _rightShift ? 1 : 0, _symDown ? 1 : 0);
 				}
 			}
-			if (down && _haptic)
-				BbkHaptic::tick();
 			_hid.keyEvent(k->key(), mods, down);
 			return true;
 		}
@@ -1233,22 +1193,6 @@ private slots:
 	void onKeepAwake()
 	{
 		keepScreenAwake();
-	}
-
-	// The vibration switch.
-	void onAction()
-	{
-		QToolButton *b = qobject_cast<QToolButton *>(sender());
-		if (!b)
-			return;
-		const int action = b->property("bbkAction").toInt();
-		if (action != ActVibe)
-			return;
-
-		_haptic = b->isChecked();
-		b->setText(QString::fromUtf8(_haptic ? "振动开" : "振动关"));
-		if (_haptic)
-			BbkHaptic::tick();
 	}
 
 	void onPeer(const QString &peer)
@@ -1361,7 +1305,6 @@ private:
 	QSignalMapper *_keyTaps;
 	bool         _rightShift;
 	bool         _symDown;
-	bool         _haptic;
 };
 
 // --- hidtest callbacks -----------------------------------------------------

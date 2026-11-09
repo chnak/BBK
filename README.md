@@ -12,7 +12,6 @@ HID 报告发给 PC；不装驱动、不用配对软件，Windows 会把它识�
 - **触控板**：单指移动、轻点左键、双击拖选、双指轻点右键、三指轻点中键、双指捏合缩放
 - **物理方向键区**：Q20 触控板周围的导航键走 BPS `SCREEN_EVENT_JOYSTICK`，转成鼠标移动
 - **音量 / 媒体键**：发 HID consumer 报告（静音、音量、播放、上一首/下一首）
-- **振动反馈**：按键、动作成功时轻震，出错时长震；界面上有「振动开 / 振动关」开关
 - **屏幕常亮**：前台时把显示器和窗口标记为 KEEP_AWAKE，避免当鼠标用时熄屏
 - **自动重连**：链路断了每 5 秒重连一次，PC 休眠 / USB 重新枚举后自动恢复
 
@@ -90,9 +89,8 @@ ssh devuser@169.254.0.1 'sh /tmp/gdej.sh'   # 设备上的重装脚本
 ## 目录
 
 ```
-main.cpp            UI、事件过滤器、BPS 屏幕/导航事件、振动开关
+main.cpp            UI、事件过滤器、BPS 屏幕/导航事件
 bbkhid.h/.cpp       HID over GATT 设备、按键/鼠标/滚轮/媒体报告
-bbkhaptic.h/.cpp    振动马达封装（bps/vibration.h）
 BBK.pro             qmake 工程
 bar-descriptor.xml  打包描述
 assets/             图标
